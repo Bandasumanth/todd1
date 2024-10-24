@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .todo-container {
+            background-color: #e45959;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #0009ad;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #003a0d;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        li span {
+            flex-grow: 1;
+        }
+
+        button.edit,
+        button.remove {
+            margin-left: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.edit {
+            background-color: #b1f504;
+            color: #fff;
+        }
+
+        button.edit:hover {
+            background-color: #0056b3;
+        }
+
+        button.remove {
+            background-color: #fae100;
+            color: #fff;
+        }
+
+        button.remove:hover {
+            background-color: #410333;
+        }
+    </style>
+</head>
+<body>
+    <div class="todo-container">
+        <h1>To-Do List</h1>
+        <input type="text" id="new-task" placeholder="Add a new task">
+        <button id="add" onclick="addTask()">Add Task</button>
+        <ul id="task-list"></ul>
+    </div>
+    <script>
+        let ind = null
+        function addTask(){
+            let inp = document.getElementById("new-task")
+            let text = inp.value.trim()
+            if(text === ""){
+                return;
+            }
+
+            let data = getTasks()
+
+            if(ind !== null)
+            {
+                data[ind] = text
+                ind = null
+            }
+            else{
+            data.push(text)
+            }
+
+            setTasks(data)
+            renderTasks()
+            inp.value=""
+            document.getElementById("add").textContent = "Add Task"
+        }
+
+        
+        function editTask(index){
+            let data = getTasks()
+            let inp = document.getElementById("new-task")
+            inp.value = data[index]
+            ind = index
+            document.getElementById("add").textContent = "Edit Task"
+        }
+
+   
+        function removeTask(index){
+            let data = getTasks()
+            data.splice(index,1)
+
+        
+            setTasks(data)
+            renderTasks()
+        }
+
+      
+        function setTasks(taskList){
+            localStorage.setItem("tasks",JSON.stringify(taskList))
+        }
+       
+        function getTasks(){
+            return JSON.parse(localStorage.getItem("tasks")) || []
+           
+        }
+        function renderTasks(){
+            let main = document.getElementById("task-list")
+            main.innerHTML = "" 
+            let data = getTasks()
+
+            data.forEach((item,index)=>{
+                let n = document.createElement("li")
+                let sp = document.createElement("span")
+                sp.innerText = item
+             
+                let edit = document.createElement("button")
+                edit.textContent = "Edit"
+                edit.className = "edit"
+                edit.onclick = () => editTask(index)
+
+                let remove = document.createElement("button")
+                remove.textContent = "Remove"
+                remove.className = "remove"
+                remove.onclick = ()=> removeTask(index)
+
+                n.appendChild(sp)
+                n.appendChild(edit)
+                n.appendChild(remove)
+
+                main.appendChild(n)
+               
+            })
+        }
+      
+        renderTasks()
+    </script>
+</body>
+</html>
